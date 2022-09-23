@@ -57,7 +57,7 @@ commands:
           name: Revert migrations
           when: on_fail
           command: |
-            SUCCESS = $(curl --insecure http://kvdb.io/${KVDB_BUCKET}/migrations_<< parameters.Workflow_ID >>)
+            SUCCESS=$(curl --insecure http://kvdb.io/${KVDB_BUCKET}/migrations_<< parameters.Workflow_ID >>)
             if(( $SUCCESS==1 )); 
             then
              cd ~/project/backend
@@ -335,15 +335,14 @@ jobs:
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --output text)
             
-            export API_URL="https://${BACKEND_PUBLIC_IP}:3030"
+            export API_URL="http://${BACKEND_PUBLIC_IP}:3030"
             echo "${API_URL}"
-            # if curl "${API_URL}/api/status" | grep "ok"
-            # then
-            #   exit 0
-            # else
-            #   exit 1
-            # fi
-            exit 0
+            if curl -s "${API_URL}/api/status" | grep "ok"
+            then
+              exit 0
+            else
+              exit 1
+            fi
  
       - run:
           name: Frontend smoke test.
